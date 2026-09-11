@@ -2,7 +2,7 @@ import 'models/experience_entry.dart';
 
 const List<ExperienceEntry> experienceEntries = [
   ExperienceEntry(
-    title: 'Senior Programmer',
+    title: 'Flutter Developer',
     company: '@ Promilo (Sawara Solution Pvt Ltd)',
     date: 'Mar 2024 - Present',
     location: 'Bengaluru, India',
