@@ -59,6 +59,27 @@ const List<Project> projects = [
     ],
   ),
   Project(
+    title: 'Promilo Mobile Application',
+    subtitle: 'Core B2B platform · Company project',
+    tag: 'Live on Play Store',
+    description:
+        'Promilo\'s core B2B mobile app, used by students and job seekers across India to explore '
+        'opportunities and connect with companies.',
+    highlights: [
+      'Dynamic form engine driven by server-side schemas, so new fields ship without an app update.',
+      'Clean Architecture applied across 15+ feature modules with MobX for state management.',
+      'Razorpay in-app payments; app size reduced via R8/ProGuard shrinking.',
+    ],
+    techStack: ['Flutter', 'MobX', 'Clean Architecture', 'Razorpay'],
+    links: [
+      ProjectLink(
+        type: ProjectLinkType.live,
+        url: 'https://play.google.com/store/apps/details?id=com.promilo.app',
+        tooltip: 'Live on Play Store',
+      ),
+    ],
+  ),
+  Project(
     title: 'Flutter Metrics SDK & AI Performance Dashboard',
     subtitle: 'Open-source package · Full-stack side project',
     tag: 'Published on pub.dev',
@@ -95,27 +116,6 @@ const List<Project> projects = [
         url:
             'https://github.com/favadthottathil/ai-performance-intelligence-dashboard-Flutter-web',
         tooltip: 'Source code',
-      ),
-    ],
-  ),
-  Project(
-    title: 'Promilo Mobile Application',
-    subtitle: 'Core B2B platform · Company project',
-    tag: 'Live on Play Store',
-    description:
-        'Promilo\'s core B2B mobile app, used by students and job seekers across India to explore '
-        'opportunities and connect with companies.',
-    highlights: [
-      'Dynamic form engine driven by server-side schemas, so new fields ship without an app update.',
-      'Clean Architecture applied across 15+ feature modules with MobX for state management.',
-      'Razorpay in-app payments; app size reduced via R8/ProGuard shrinking.',
-    ],
-    techStack: ['Flutter', 'MobX', 'Clean Architecture', 'Razorpay'],
-    links: [
-      ProjectLink(
-        type: ProjectLinkType.live,
-        url: 'https://play.google.com/store/apps/details?id=com.promilo.app',
-        tooltip: 'Live on Play Store',
       ),
     ],
   ),
