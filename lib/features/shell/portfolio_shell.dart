@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -36,6 +37,14 @@ class _PortfolioShellState extends State<PortfolioShell> {
   final ValueNotifier<double> _progress = ValueNotifier(0);
   final ValueNotifier<bool> _navCondensed = ValueNotifier(false);
 
+  /// True while the page is moving. Content ignores the pointer meanwhile, so
+  /// cards gliding under a resting cursor don't fire hover enter/exit, rebuild
+  /// and start their tilt animation on every frame of a wheel scroll.
+  /// (Scrollable does this itself for touch drags and flings, but not for
+  /// mouse-wheel scrolling, which jumps the position directly.)
+  final ValueNotifier<bool> _isScrolling = ValueNotifier(false);
+  Timer? _scrollEndTimer;
+
   final GlobalKey _aboutKey = GlobalKey();
   final GlobalKey _experienceKey = GlobalKey();
   final GlobalKey _projectsKey = GlobalKey();
@@ -51,6 +60,8 @@ class _PortfolioShellState extends State<PortfolioShell> {
   void dispose() {
     _scrollController.removeListener(_handleScroll);
     _scrollController.dispose();
+    _scrollEndTimer?.cancel();
+    _isScrolling.dispose();
     _scrollOffset.dispose();
     _progress.dispose();
     _navCondensed.dispose();
@@ -66,6 +77,13 @@ class _PortfolioShellState extends State<PortfolioShell> {
         ? 0
         : (pixels / position.maxScrollExtent).clamp(0.0, 1.0);
     _navCondensed.value = pixels > 12;
+
+    _isScrolling.value = true;
+    _scrollEndTimer?.cancel();
+    _scrollEndTimer = Timer(
+      const Duration(milliseconds: 160),
+      () => _isScrolling.value = false,
+    );
   }
 
   void _scrollToSection(GlobalKey key) {
@@ -115,27 +133,32 @@ class _PortfolioShellState extends State<PortfolioShell> {
                   controller: _scrollController,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding.toDouble(),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: isDesktop ? 170 : 120),
-                          const HeroSection(),
-                          SizedBox(height: isDesktop ? 160 : 90),
-                          AboutSection(key: _aboutKey),
-                          SizedBox(height: isDesktop ? 160 : 90),
-                          ExperienceSection(key: _experienceKey),
-                          SizedBox(height: isDesktop ? 160 : 90),
-                          ProjectsSection(key: _projectsKey),
-                          SizedBox(height: isDesktop ? 160 : 90),
-                          SkillsSection(key: _skillsKey),
-                          SizedBox(height: isDesktop ? 140 : 80),
-                          const _Footer(),
-                          SizedBox(height: isDesktop ? 70 : 48),
-                        ],
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: _isScrolling,
+                      builder: (context, scrolling, child) =>
+                          IgnorePointer(ignoring: scrolling, child: child),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPadding.toDouble(),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: isDesktop ? 170 : 120),
+                            const HeroSection(),
+                            SizedBox(height: isDesktop ? 160 : 90),
+                            AboutSection(key: _aboutKey),
+                            SizedBox(height: isDesktop ? 160 : 90),
+                            ExperienceSection(key: _experienceKey),
+                            SizedBox(height: isDesktop ? 160 : 90),
+                            ProjectsSection(key: _projectsKey),
+                            SizedBox(height: isDesktop ? 160 : 90),
+                            SkillsSection(key: _skillsKey),
+                            SizedBox(height: isDesktop ? 140 : 80),
+                            const _Footer(),
+                            SizedBox(height: isDesktop ? 70 : 48),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -172,75 +195,82 @@ class _PortfolioShellState extends State<PortfolioShell> {
   }
 
   Widget _buildNavBar(BuildContext context, bool isDesktop) {
+    final bar = ValueListenableBuilder<bool>(
+      valueListenable: _navCondensed,
+      builder: (context, condensed, child) => AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOut,
+        decoration: BoxDecoration(
+          // Phones get no backdrop blur (see below), so the bar is
+          // more opaque there to keep text behind it from showing through.
+          color: AppColors.background.withValues(
+            alpha: isDesktop
+                ? (condensed ? 0.72 : 0.35)
+                : (condensed ? 0.96 : 0.6),
+          ),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withValues(alpha: condensed ? 0.07 : 0.02),
+            ),
+          ),
+        ),
+        child: child,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isDesktop ? 32 : 18,
+                vertical: 14,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildWordmark(),
+                  if (isDesktop)
+                    Row(
+                      children: [
+                        NavBarItem(
+                          title: 'About',
+                          onPressed: () => _scrollToSection(_aboutKey),
+                        ),
+                        NavBarItem(
+                          title: 'Experience',
+                          onPressed: () => _scrollToSection(_experienceKey),
+                        ),
+                        NavBarItem(
+                          title: 'Projects',
+                          onPressed: () => _scrollToSection(_projectsKey),
+                        ),
+                        NavBarItem(
+                          title: 'Skills',
+                          onPressed: () => _scrollToSection(_skillsKey),
+                        ),
+                        const SizedBox(width: 14),
+                        const AnimatedResumeButton(),
+                      ],
+                    )
+                  else
+                    const AnimatedResumeButton(compact: true),
+                ],
+              ),
+            ),
+          ),
+          _buildProgressBar(),
+        ],
+      ),
+    );
+
+    // The only BackdropFilter on the page. It resamples everything behind the
+    // bar each frame, which phone GPUs feel during scroll, so it's desktop-only.
+    if (!isDesktop) return bar;
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: ValueListenableBuilder<bool>(
-          valueListenable: _navCondensed,
-          builder: (context, condensed, child) => AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOut,
-            decoration: BoxDecoration(
-              color: AppColors.background.withValues(
-                alpha: condensed ? 0.72 : 0.35,
-              ),
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(
-                    alpha: condensed ? 0.07 : 0.02,
-                  ),
-                ),
-              ),
-            ),
-            child: child,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isDesktop ? 32 : 18,
-                    vertical: 14,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildWordmark(),
-                      if (isDesktop)
-                        Row(
-                          children: [
-                            NavBarItem(
-                              title: 'About',
-                              onPressed: () => _scrollToSection(_aboutKey),
-                            ),
-                            NavBarItem(
-                              title: 'Experience',
-                              onPressed: () => _scrollToSection(_experienceKey),
-                            ),
-                            NavBarItem(
-                              title: 'Projects',
-                              onPressed: () => _scrollToSection(_projectsKey),
-                            ),
-                            NavBarItem(
-                              title: 'Skills',
-                              onPressed: () => _scrollToSection(_skillsKey),
-                            ),
-                            const SizedBox(width: 14),
-                            const AnimatedResumeButton(),
-                          ],
-                        )
-                      else
-                        const AnimatedResumeButton(compact: true),
-                    ],
-                  ),
-                ),
-              ),
-              _buildProgressBar(),
-            ],
-          ),
-        ),
+        child: bar,
       ),
     );
   }
