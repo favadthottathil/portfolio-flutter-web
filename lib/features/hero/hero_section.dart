@@ -26,7 +26,7 @@ class HeroSection extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const StatusPill(label: 'Available for Flutter roles')
+            const StatusPill(label: 'Available now · Immediate joiner')
                 .animate()
                 .fadeIn(duration: 600.ms)
                 .slideY(begin: -0.4, end: 0, curve: Curves.easeOutCubic),
@@ -54,6 +54,7 @@ class HeroSection extends StatelessWidget {
               child: TypingText(
                 phrases: const [
                   'Flutter Developer.',
+                  'Android & iOS app builder.',
                   'Clean Architecture advocate.',
                   'BLoC & MobX at scale.',
                   'CI/CD and release owner.',
@@ -75,10 +76,10 @@ class HeroSection extends StatelessWidget {
                       ? constraints.maxWidth * 0.62
                       : constraints.maxWidth,
                   child: Text(
-                    '3.4+ years in Flutter, building Android and iOS apps for a live B2B company. '
-                    'I led the architecture for CollegeLinkr — a B2B EdTech platform — from the ground up '
-                    'with Clean Architecture and BLoC, and I own the full release pipeline: CI/CD, code '
-                    'signing, Play Store and App Store publishing.',
+                    '3.4+ years building Android and iOS apps that real people use every day — '
+                    'including Promilo (100K+ downloads, 4.7-star rating). In 3 months I took two new apps, '
+                    'CollegeLinkr and its Student companion, from first design to launch on the Play '
+                    'Store and App Store. I care about app quality and security, and I can join immediately.',
                     style: TextStyle(
                       fontSize: isDesktop ? 18 : 15.5,
                       color: Colors.white.withValues(alpha: 0.62),
@@ -126,9 +127,9 @@ class HeroSection extends StatelessWidget {
             const StatStrip(
               stats: [
                 StatItem(value: '3.4+', label: 'Years in Flutter'),
-                StatItem(value: '55k', label: 'Lines of Dart architected'),
-                StatItem(value: '30%', label: 'Manual QA time cut'),
-                StatItem(value: '2', label: 'Apps live on Play Store'),
+                StatItem(value: '100K+', label: 'Promilo downloads'),
+                StatItem(value: '33%', label: 'Smaller app size'),
+                StatItem(value: '2', label: 'Apps launched in 3 months'),
               ],
             ).animate().fadeIn(delay: 1000.ms, duration: 900.ms).slideY(
                   begin: 0.15,

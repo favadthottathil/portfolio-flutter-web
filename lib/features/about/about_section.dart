@@ -14,13 +14,15 @@ class AboutSection extends StatelessWidget {
         'then moved into code — a year as a trainee Flutter developer at Brototype in Calicut, '
         'building real Dart projects under mentorship, turned that into a career. Counting that '
         'year, I have been working in Flutter for 3.4+ years.',
-    'Since joining Promilo I have worked on production mobile apps that real businesses depend on: '
-        'lead pipelines, KYC and payments, release engineering. I care most about the parts that '
+    'From March 2024 to August 2026 at Promilo I worked on production mobile apps that real '
+        'businesses depend on — a B2B app with 100K+ downloads, plus CollegeLinkr and its Student '
+        'app, which I took from first design to both app stores in three months. Lead pipelines, '
+        'KYC and payments, release engineering. I care most about the parts that '
         'are invisible when they work — session handling that does not drop users, architecture '
         'that survives the next feature, tests that catch the regression before QA does.',
     'I am based in Bengaluru, originally from the Malabar region of Kerala, and I work in '
-        'Malayalam and English. Outside the day job I publish open-source Flutter packages and '
-        'take on selective freelance work.',
+        'Malayalam and English. On the side I build open-source Flutter tooling and AI-powered '
+        'apps with Google Gemini. I am available to join immediately, with no notice period.',
   ];
 
   @override
@@ -73,6 +75,7 @@ class AboutSection extends StatelessWidget {
                       _Fact(label: 'From', value: 'Kerala, India'),
                       _Fact(label: 'Languages', value: 'Malayalam, English'),
                       _Fact(label: 'Open to', value: 'Flutter roles'),
+                      _Fact(label: 'Notice period', value: 'Immediate joiner'),
                     ],
                   ),
                 ],
