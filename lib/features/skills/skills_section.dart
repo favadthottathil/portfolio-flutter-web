@@ -18,8 +18,8 @@ class SkillsSection extends StatelessWidget {
     final cardWidth = width > 1100
         ? 340.0
         : width > 700
-            ? 300.0
-            : double.infinity;
+        ? 300.0
+        : double.infinity;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

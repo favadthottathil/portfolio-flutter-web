@@ -1,17 +1,27 @@
-# portfolio
+# Favad Thottathil: Portfolio
 
-A new Flutter project.
+[![CI/CD](https://github.com/favadthottathil/portfolio-flutter-web/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/favadthottathil/portfolio-flutter-web/actions/workflows/ci-cd.yml)
+[![Link check](https://github.com/favadthottathil/portfolio-flutter-web/actions/workflows/link-check.yml/badge.svg)](https://github.com/favadthottathil/portfolio-flutter-web/actions/workflows/link-check.yml)
 
-## Getting Started
+A single-page portfolio built with Flutter Web, deployed on Vercel:
+<https://portfolio-favad-ts-projects.vercel.app>
 
-This project is a starting point for a Flutter application.
+## Develop
 
-A few resources to get you started if this is your first Flutter project:
+```bash
+flutter pub get
+flutter run -d chrome
+flutter analyze && flutter test
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The Flutter version is pinned in [`.fvmrc`](.fvmrc). With [FVM](https://fvm.app),
+run `fvm use` to match it.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Content (experience, projects, skills) lives in the `lib/features/*/*_data.dart`
+files. See [`CLAUDE.md`](CLAUDE.md) for the architecture and the
+scroll-performance rules.
+
+## CI/CD
+
+Every PR is formatted, analyzed, tested, built, size-checked and smoke-tested
+in a real browser before it can deploy. See [`docs/CI_CD.md`](docs/CI_CD.md).

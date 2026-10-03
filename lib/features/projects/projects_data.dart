@@ -3,8 +3,7 @@ import 'models/project.dart';
 const List<Project> projects = [
   Project(
     title: 'CollegeLinkr',
-    subtitle:
-        'Agent app · Technical lead · iOS & Android · Jun – Aug 2026',
+    subtitle: 'Agent app · Technical lead · iOS & Android · Jun – Aug 2026',
     tag: 'Live on Play Store · 50+ downloads',
     description:
         'An app for education consultants to find, manage and track college-admission leads from '
@@ -41,8 +40,7 @@ const List<Project> projects = [
   ),
   Project(
     title: 'CollegeLinkr Student',
-    subtitle:
-        'Admission app · Solo developer · iOS & Android · Jun – Aug 2026',
+    subtitle: 'Admission app · Solo developer · iOS & Android · Jun – Aug 2026',
     description:
         'Built entirely on my own: an app for students to discover colleges, apply for admission, '
         'pay fees, and track their application status end to end. Feature-first BLoC architecture '

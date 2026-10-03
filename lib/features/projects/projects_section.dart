@@ -23,9 +23,7 @@ class ProjectsSection extends StatelessWidget {
         const SizedBox(height: 44),
         for (var i = 0; i < projects.length; i++) ...[
           if (i > 0) const SizedBox(height: 28),
-          ScrollReveal(
-            child: ProjectCard(project: projects[i]),
-          ),
+          ScrollReveal(child: ProjectCard(project: projects[i])),
         ],
       ],
     );

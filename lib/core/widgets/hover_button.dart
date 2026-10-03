@@ -33,7 +33,9 @@ class _HoverButtonState extends State<HoverButton> {
         curve: Curves.easeOutCubic,
         transform: Matrix4.identity()
           ..translateByDouble(0.0, isHovered ? -5.0 : 0.0, 0.0, 1.0),
-        child: widget.isPrimary ? _buildPrimary(context) : _buildOutlined(context),
+        child: widget.isPrimary
+            ? _buildPrimary(context)
+            : _buildOutlined(context),
       ),
     );
   }
@@ -57,7 +59,9 @@ class _HoverButtonState extends State<HoverButton> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: AppColors.background,
         elevation: isHovered ? 20 : 0,
-        shadowColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+        shadowColor: Theme.of(
+          context,
+        ).colorScheme.primary.withValues(alpha: 0.6),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
