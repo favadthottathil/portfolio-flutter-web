@@ -3,20 +3,21 @@ import 'models/project.dart';
 const List<Project> projects = [
   Project(
     title: 'CollegeLinkr',
-    subtitle: 'B2B EdTech agent app · Architecture lead · iOS & Android',
-    tag: 'Live on Play Store',
+    subtitle:
+        'Agent app · Technical lead · iOS & Android · Jun – Aug 2026',
+    tag: 'Live on Play Store · 50+ downloads',
     description:
-        'A B2B EdTech platform used by education consultants to manage the full college-admission '
-        'lead lifecycle — browse colleges and courses, pick and track leads, submit applications, '
-        'handle commission payouts, manage a wallet, and complete KYC. I led the architecture from '
-        'the ground up: ~55,000 lines of hand-written Dart across 8 feature modules, backed by 34 '
-        'widget and BLoC test files.',
+        'An app for education consultants to find, manage and track college-admission leads from '
+        'start to finish — browse the college directory, pick leads from a marketplace, submit and '
+        'track applications, handle commissions, manage a wallet, and complete KYC. I led the '
+        'technical planning from the ground up: ~55,000 lines of hand-written Dart across 8 feature '
+        'modules, backed by 34 automated test files and live crash monitoring.',
     highlights: [
-      'Session infrastructure: one Dio interceptor injects JWTs and queues concurrent requests behind a single refresh call on 401, plus a 15-minute inactivity timer that force-logs-out through an app-wide AuthBloc.',
-      'Security hardening for KYC and financial data — certificate pinning, root/jailbreak detection, FLAG_SECURE screens, masked Aadhaar/PAN with biometric-gated reveal, and obfuscated release builds.',
-      'Multi-flavor builds with separate dev/prod entry points selecting env config via --dart-define over one shared bootstrap.',
-      'Commission-revert settlement flow and a Lead Marketplace with wallet or Razorpay payment and tiered recharge bonuses.',
-      'Push-to-deep-link pipeline resolving FCM payloads and universal links through one shared handler.',
+      'Lead Marketplace with an in-app wallet, Razorpay online payments, and tiered bonus offers on recharges.',
+      'College directory and application tracking with commission and refund countdowns, so consultants always know where each case stands.',
+      'Session security: one Dio interceptor injects JWTs and queues concurrent requests behind a single refresh call on 401, plus automatic logout after 15 minutes of inactivity.',
+      'KYC and payment hardening — certificate pinning, screenshot blocking (FLAG_SECURE) on payment and KYC screens, and obfuscated release builds.',
+      'FCM push notifications with deep links that open the right screen when tapped, plus in-app banners for important announcements.',
     ],
     techStack: [
       'Flutter',
@@ -27,6 +28,7 @@ const List<Project> projects = [
       'freezed',
       'go_router',
       'Razorpay',
+      'FCM',
     ],
     links: [
       ProjectLink(
@@ -39,16 +41,17 @@ const List<Project> projects = [
   ),
   Project(
     title: 'CollegeLinkr Student',
-    subtitle: 'Student companion app · Solo developer · iOS & Android',
+    subtitle:
+        'Admission app · Solo developer · iOS & Android · Jun – Aug 2026',
     description:
-        'Companion app for prospective students to discover college programs, complete multi-step '
-        'admission applications, pay fees, and track application status end to end. Built solo with '
-        'a feature-first BLoC architecture across 6 modules.',
+        'Built entirely on my own: an app for students to discover colleges, apply for admission, '
+        'pay fees, and track their application status end to end. Feature-first BLoC architecture '
+        'across 6 modules.',
     highlights: [
-      'JWT/OTP authentication with silent token refresh through a dedicated interceptor.',
-      'Server-driven 6-step dynamic application form engine rendered from a backend JSON schema, so new fields ship without an app update.',
-      'Razorpay fee payments with backend-verified status, in-app document upload and PDF previews.',
-      'Deep linking with auth-gated go_router routing.',
+      'Server-driven 6-step application form rendered from a backend JSON schema, so changes go live without an app update.',
+      'OTP login with JWT sessions and silent token refresh, keeping users signed in safely.',
+      'Razorpay fee payments confirmed by the server before an application is marked as paid.',
+      'Document upload, in-app PDF preview, and deep links that open the right screen after login via auth-gated go_router routing.',
     ],
     techStack: [
       'Flutter',
@@ -60,17 +63,25 @@ const List<Project> projects = [
   ),
   Project(
     title: 'Promilo Mobile Application',
-    subtitle: 'Core B2B platform · Company project',
-    tag: 'Live on Play Store',
+    subtitle: 'B2B platform · Company project · Mar 2024 – Aug 2026',
+    tag: 'Live on Play Store · 100K+ downloads · 4.7 rating',
     description:
-        'Promilo\'s core B2B mobile app, used by students and job seekers across India to explore '
-        'opportunities and connect with companies.',
+        'Promilo\'s busy B2B mobile app, with 100K+ downloads and a 4.7-star rating on the Play Store. '
+        'I maintained and improved it, owning multiple features end to end.',
     highlights: [
-      'Dynamic form engine driven by server-side schemas, so new fields ship without an app update.',
-      'Clean Architecture applied across 15+ feature modules with MobX for state management.',
-      'Razorpay in-app payments; app size reduced via R8/ProGuard shrinking.',
+      'Flexible form system driven by server-side schemas, plus in-app video calling (VideoSDK) so users can meet and share details inside the app.',
+      'Made the app 33% smaller (45 MB → 30 MB) through app size optimization, including R8/ProGuard shrinking.',
+      'Automated testing suite (42+ test cases) that cut manual testing effort by 30%.',
+      'Push notifications and crash reporting, polished screens from design mockups, and releases to the Play Store and App Store.',
     ],
-    techStack: ['Flutter', 'MobX', 'Clean Architecture', 'Razorpay'],
+    techStack: [
+      'Flutter',
+      'MobX',
+      'Clean Architecture',
+      'VideoSDK',
+      'Firebase',
+      'Razorpay',
+    ],
     links: [
       ProjectLink(
         type: ProjectLinkType.live,
@@ -88,6 +99,7 @@ const List<Project> projects = [
         'The SDK captures render-time, frame-drop, API-latency, and crash events with auto-flush on '
         'lifecycle changes, backed by 16 unit tests.',
     highlights: [
+      'Built the whole system end to end — from in-app data collection to the final dashboard.',
       'Flutter Web dashboard (fl_chart, go_router) showing real-time metrics with AI-generated, severity-scored insights.',
       'Node.js/Express + PostgreSQL backend with a JWT-authenticated ingestion API, per-key rate limiting, and SSE streaming.',
       'Gemini integration generating issue and recommendation reports automatically; Razorpay for subscription billing.',
@@ -113,9 +125,50 @@ const List<Project> projects = [
       ),
       ProjectLink(
         type: ProjectLinkType.source,
+        url: 'https://github.com/favadthottathil/flutter_metrics_sdk',
+        tooltip: 'SDK source',
+      ),
+      ProjectLink(
+        type: ProjectLinkType.source,
         url:
             'https://github.com/favadthottathil/ai-performance-intelligence-dashboard-Flutter-web',
-        tooltip: 'Source code',
+        tooltip: 'Dashboard source',
+      ),
+      ProjectLink(
+        type: ProjectLinkType.source,
+        url:
+            'https://github.com/favadthottathil/ai-performance-intelligence-backend',
+        tooltip: 'Backend source',
+      ),
+    ],
+  ),
+  Project(
+    title: 'Zenith AI',
+    subtitle: 'Cross-platform AI app · Personal project',
+    description:
+        'An AI-powered app that gives instant, live responses using Google Gemini. I built and '
+        'deployed both the Flutter app and its Python backend.',
+    highlights: [
+      'Instant, live AI responses powered by the Google Gemini API.',
+      'Full-stack ownership — Flutter frontend plus a Python server, both built and deployed solo.',
+    ],
+    techStack: ['Flutter', 'Dart', 'Python', 'Gemini API'],
+    links: [
+      ProjectLink(
+        type: ProjectLinkType.live,
+        url:
+            'https://drive.google.com/file/d/1UoRn2k7PXIjdUzWEVpdQZbUjQZpA6Hz4/view?usp=sharing',
+        tooltip: 'Download Android APK',
+      ),
+      ProjectLink(
+        type: ProjectLinkType.source,
+        url: 'https://github.com/favadthottathil/ZenithAI-FrontEnd',
+        tooltip: 'Frontend source',
+      ),
+      ProjectLink(
+        type: ProjectLinkType.source,
+        url: 'https://github.com/favadthottathil/ZenithAI-Backend-python',
+        tooltip: 'Backend source',
       ),
     ],
   ),
