@@ -54,7 +54,9 @@ class AboutSection extends StatelessWidget {
                     Text(
                       _paragraphs[i],
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: i == 0 ? 0.78 : 0.6),
+                        color: Colors.white.withValues(
+                          alpha: i == 0 ? 0.78 : 0.6,
+                        ),
                         fontSize: isWide ? 16.5 : 15,
                         height: 1.85,
                         letterSpacing: 0.2,

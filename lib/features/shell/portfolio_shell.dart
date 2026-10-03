@@ -245,7 +245,6 @@ class _PortfolioShellState extends State<PortfolioShell> {
     );
   }
 
-
   Widget _buildWordmark() {
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -50,8 +50,9 @@ class _ExperienceTitle extends StatelessWidget {
 
         return Flex(
           direction: isMobile ? Axis.vertical : Axis.horizontal,
-          crossAxisAlignment:
-              isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+          crossAxisAlignment: isMobile
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(
@@ -81,17 +82,21 @@ class _ExperienceTitle extends StatelessWidget {
             ),
             if (isMobile) const SizedBox(height: 10),
             Column(
-              crossAxisAlignment:
-                  isMobile ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+              crossAxisAlignment: isMobile
+                  ? CrossAxisAlignment.start
+                  : CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(100),
-                    border:
-                        Border.all(color: Colors.white.withValues(alpha: 0.09)),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.09),
+                    ),
                   ),
                   child: Text(
                     entry.date,
@@ -144,10 +149,7 @@ class _BulletPoint extends StatelessWidget {
               color: accent,
               shape: BoxShape.circle,
               boxShadow: [
-                BoxShadow(
-                  color: accent.withValues(alpha: 0.6),
-                  blurRadius: 8,
-                ),
+                BoxShadow(color: accent.withValues(alpha: 0.6), blurRadius: 8),
               ],
             ),
           ),

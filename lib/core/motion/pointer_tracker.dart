@@ -11,7 +11,10 @@ class PointerTracker extends StatefulWidget {
 
   static ValueListenable<Offset> of(BuildContext context) {
     final scope = context.dependOnInheritedWidgetOfExactType<_PointerScope>();
-    assert(scope != null, 'PointerTracker.of() called outside a PointerTracker');
+    assert(
+      scope != null,
+      'PointerTracker.of() called outside a PointerTracker',
+    );
     return scope!.pointer;
   }
 

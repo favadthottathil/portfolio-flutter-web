@@ -120,22 +120,24 @@ class HeroSection extends StatelessWidget {
                 )
                 .animate()
                 .fadeIn(delay: 800.ms, duration: 800.ms)
-                .scale(begin: const Offset(0.94, 0.94), curve: Curves.easeOutBack),
+                .scale(
+                  begin: const Offset(0.94, 0.94),
+                  curve: Curves.easeOutBack,
+                ),
 
             SizedBox(height: isDesktop ? 72 : 48),
 
             const StatStrip(
-              stats: [
-                StatItem(value: '3.4+', label: 'Years in Flutter'),
-                StatItem(value: '100K+', label: 'Promilo downloads'),
-                StatItem(value: '33%', label: 'Smaller app size'),
-                StatItem(value: '2', label: 'Apps launched in 3 months'),
-              ],
-            ).animate().fadeIn(delay: 1000.ms, duration: 900.ms).slideY(
-                  begin: 0.15,
-                  end: 0,
-                  curve: Curves.easeOutCubic,
-                ),
+                  stats: [
+                    StatItem(value: '3.4+', label: 'Years in Flutter'),
+                    StatItem(value: '100K+', label: 'Promilo downloads'),
+                    StatItem(value: '33%', label: 'Smaller app size'),
+                    StatItem(value: '2', label: 'Apps launched in 3 months'),
+                  ],
+                )
+                .animate()
+                .fadeIn(delay: 1000.ms, duration: 900.ms)
+                .slideY(begin: 0.15, end: 0, curve: Curves.easeOutCubic),
           ],
         );
       },

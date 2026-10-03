@@ -117,7 +117,6 @@ class _ProjectCardState extends State<ProjectCard> {
       ),
     );
   }
-
 }
 
 class _Highlight extends StatelessWidget {
@@ -218,7 +217,9 @@ class _ProjectGlyph extends StatelessWidget {
             accent.withValues(alpha: 0.04),
           ],
         ),
-        border: Border.all(color: accent.withValues(alpha: hovered ? 0.6 : 0.3)),
+        border: Border.all(
+          color: accent.withValues(alpha: hovered ? 0.6 : 0.3),
+        ),
         boxShadow: hovered
             ? [
                 BoxShadow(

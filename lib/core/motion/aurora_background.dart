@@ -68,9 +68,7 @@ class _AuroraPainter extends CustomPainter {
     required this.seconds,
     required this.pointer,
     required this.scrollOffset,
-  }) : super(
-          repaint: Listenable.merge([seconds, pointer, scrollOffset]),
-        );
+  }) : super(repaint: Listenable.merge([seconds, pointer, scrollOffset]));
 
   final ValueListenable<double> seconds;
   final ValueListenable<Offset> pointer;
@@ -94,14 +92,13 @@ class _AuroraPainter extends CustomPainter {
       final t = seconds * 0.12 + blob.phase;
       final depth = 26 * blob.intensity;
       final center = Offset(
-        (blob.center.dx + math.cos(t) * 0.05) * size.width +
-            pointer.dx * depth,
+        (blob.center.dx + math.cos(t) * 0.05) * size.width + pointer.dx * depth,
         (blob.center.dy + math.sin(t * 0.9) * 0.05) * size.height +
             pointer.dy * depth -
             scrollOffset * 0.06,
       );
-      final radius = blob.radius * size.shortestSide *
-          (1 + 0.06 * math.sin(t * 1.3));
+      final radius =
+          blob.radius * size.shortestSide * (1 + 0.06 * math.sin(t * 1.3));
 
       canvas.drawCircle(
         center,
@@ -122,13 +119,7 @@ class _AuroraPainter extends CustomPainter {
 }
 
 class _Blob {
-  const _Blob(
-    this.color,
-    this.center,
-    this.radius,
-    this.intensity,
-    this.phase,
-  );
+  const _Blob(this.color, this.center, this.radius, this.intensity, this.phase);
 
   final Color color;
   final Offset center;
