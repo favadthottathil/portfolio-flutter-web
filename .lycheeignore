@@ -1,0 +1,4 @@
+# LinkedIn answers bots with HTTP 999 regardless of whether the page exists.
+^https://(www\.)?linkedin\.com/
+# Placeholder / local URLs.
+^https?://(localhost|127\.0\.0\.1)

@@ -13,13 +13,21 @@ flutter pub get              # install dependencies
 flutter run -d chrome        # run locally in a browser with hot reload
 flutter build web            # production build -> build/web
 flutter analyze              # static analysis (uses analysis_options.yaml / flutter_lints)
+flutter test                 # unit tests in test/
+dart format lib test         # CI fails on unformatted code
 ```
 
-There is no `test/` directory and no tests currently in the project.
+The Flutter version is pinned in `.fvmrc`, the single source of truth for CI, `build.sh` and FVM. Upgrade Flutter by editing only that file.
+
+Tests in [test/](test/) are data-integrity and contract tests: unique titles, `https` project links, well-formed experience date ranges (`Mon YYYY - Mon YYYY|Present`), no skill listed twice, and the resume PDF and web-URL prefix (see Resume download below). When you change content in a `*_data.dart` file, run `flutter test`; a failure there usually means a typo in the data, not a broken test. There are no widget tests, because most widgets use `google_fonts`, which fetches at runtime. Rendering is covered instead by the headless-browser smoke test in [tool/smoke/](tool/smoke/).
+
+### CI/CD
+
+[.github/workflows/ci-cd.yml](.github/workflows/ci-cd.yml) runs these jobs: quality (format, analyze with `--fatal-infos`, test), build (release build plus a 2.5 MiB `main.dart.js` budget), smoke (Playwright loads the build and fails on any console error or a missing resume), then a Vercel deploy of the *tested artifact* via `vercel deploy --prebuilt`. The deploy jobs only run once the `VERCEL_PROJECT_ID` repo variable is set. Actions are pinned to commit SHAs; keep the `# vX.Y.Z` comment when bumping them. Full details and setup steps are in [docs/CI_CD.md](docs/CI_CD.md).
 
 ### Deployment
 
-Deployed on Vercel (see [vercel.json](vercel.json)). The build command is [build.sh](build.sh), which clones the `stable` Flutter SDK into the workspace at build time (Vercel's build image has no Flutter preinstalled) and runs `flutter build web`. Output directory is `build/web`, with a catch-all rewrite to `index.html` for client-side routing.
+Deployed on Vercel (see [vercel.json](vercel.json)). The build command is [build.sh](build.sh), which clones the Flutter SDK at the version pinned in `.fvmrc` into the workspace at build time (Vercel's build image has no Flutter preinstalled), runs `flutter pub get --enforce-lockfile` and `flutter build web --release`, and fails if the resume PDF is missing from the output. Once GitHub-driven deploys are enabled (see docs/CI_CD.md), Vercel no longer builds; CI uploads a prebuilt `build/web`, and [tool/vercel_prebuilt.sh](tool/vercel_prebuilt.sh) recreates the SPA rewrite for it. Output directory is `build/web`, with a catch-all rewrite to `index.html` for client-side routing.
 
 ## Architecture
 

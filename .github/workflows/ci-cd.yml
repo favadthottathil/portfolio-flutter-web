@@ -1,0 +1,258 @@
+name: CI/CD
+
+# One pipeline, build once / deploy the same bytes:
+#
+#   quality ─┐
+#            ├─> smoke ─┬─> deploy-preview     (pull requests)
+#   build ───┘          └─> deploy-production  (push to main)
+#
+# Deploy jobs only run once Vercel is wired up (repo variable
+# VERCEL_PROJECT_ID set) — see docs/CI_CD.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  # Supersede stale PR runs, but never cancel a production deploy mid-flight.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_SUPPRESS_ANALYTICS: "true"
+  # Hard ceiling for the compiled Dart bundle; raise deliberately, not by accident.
+  MAIN_JS_BUDGET_BYTES: "2621440" # 2.5 MiB
+  RESUME_PATH: build/web/assets/assets/Favad_Thottathil_Resume.pdf
+
+jobs:
+  quality:
+    name: Format · Analyze · Test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: .fvmrc
+          cache: true
+
+      - name: Install dependencies (lockfile must be up to date)
+        run: flutter pub get --enforce-lockfile
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos --fatal-warnings
+
+      - name: Test
+        run: flutter test --coverage --reporter=github
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          retention-days: 7
+          if-no-files-found: ignore
+
+  build:
+    name: Build web (release)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version-file: .fvmrc
+          cache: true
+
+      - run: flutter pub get --enforce-lockfile
+
+      - name: Build
+        run: flutter build web --release
+
+      - name: Verify build output
+        run: |
+          for f in build/web/index.html build/web/main.dart.js build/web/flutter_bootstrap.js "$RESUME_PATH"; do
+            test -s "$f" || { echo "::error file=$f::missing or empty in build output"; exit 1; }
+          done
+
+      - name: Enforce bundle budget and report sizes
+        run: |
+          main_js=$(stat -c%s build/web/main.dart.js)
+          total=$(du -sb build/web | cut -f1)
+          {
+            echo "### Web bundle"
+            echo "| Artifact | Size |"
+            echo "|---|---|"
+            echo "| \`main.dart.js\` | $(numfmt --to=iec-i --suffix=B "$main_js") (budget $(numfmt --to=iec-i --suffix=B "$MAIN_JS_BUDGET_BYTES")) |"
+            echo "| \`build/web\` total | $(numfmt --to=iec-i --suffix=B "$total") |"
+            echo "| Flutter | $(flutter --version --machine | jq -r .frameworkVersion) |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$main_js" -gt "$MAIN_JS_BUDGET_BYTES" ]; then
+            echo "::error file=build/web/main.dart.js::main.dart.js is $main_js bytes, over the $MAIN_JS_BUDGET_BYTES byte budget"
+            exit 1
+          fi
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: web-build
+          path: build/web
+          retention-days: 7
+          if-no-files-found: error
+
+  smoke:
+    name: Smoke test (headless Chromium)
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tool/smoke
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: web-build
+          path: build/web
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tool/smoke/package-lock.json
+
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+
+      - name: Serve build and run smoke test
+        env:
+          BASE_URL: http://127.0.0.1:8080
+          SCREENSHOT_DIR: ${{ github.workspace }}/smoke-screenshots
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 --directory "$GITHUB_WORKSPACE/build/web" &
+          for _ in $(seq 1 20); do curl -fs "$BASE_URL/" >/dev/null && break; sleep 0.5; done
+          npm run smoke
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: smoke-screenshots
+          path: smoke-screenshots
+          retention-days: 7
+          if-no-files-found: ignore
+
+  deploy-preview:
+    name: Deploy preview (Vercel)
+    needs: [quality, smoke]
+    # Secrets are not exposed to fork PRs, so only deploy same-repo branches.
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      vars.VERCEL_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: preview
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: web-build
+          path: build/web
+
+      - name: Link Vercel project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@62.2.0 pull --yes --environment=preview --token="$VERCEL_TOKEN"
+
+      - name: Link Vercel project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@62.2.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Assemble Vercel prebuilt output
+        run: tool/vercel_prebuilt.sh
+
+      - name: Deploy
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(npx --yes vercel@62.2.0 deploy --prebuilt --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy production (Vercel)
+    needs: [quality, smoke]
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.VERCEL_PROJECT_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.url }}
+    env:
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: web-build
+          path: build/web
+
+      - name: Assemble Vercel prebuilt output
+        run: tool/vercel_prebuilt.sh
+
+      - name: Deploy
+        id: deploy
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          url=$(npx --yes vercel@62.2.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Production: $url" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify production
+        env:
+          SITE_URL: ${{ vars.PRODUCTION_URL || steps.deploy.outputs.url }}
+        run: |
+          check() {
+            code=$(curl -s -o /dev/null -w '%{http_code}' --retry 5 --retry-all-errors --retry-delay 3 "$1")
+            echo "$code $1"
+            [ "$code" = 200 ] || { echo "::error::$1 returned $code"; exit 1; }
+          }
+          check "$SITE_URL/"
+          check "$SITE_URL/assets/assets/Favad_Thottathil_Resume.pdf"
+          check "$SITE_URL/some/deep/link" # SPA fallback to index.html
