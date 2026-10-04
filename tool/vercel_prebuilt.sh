@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Wraps build/web in Vercel's Build Output API v3 layout so CI can deploy the
 # exact artifact it tested with `vercel deploy --prebuilt`, instead of letting
-# Vercel rebuild from source. Mirrors the SPA rewrite in vercel.json.
+# Vercel rebuild from source. Mirrors the headers and SPA rewrite in vercel.json.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -15,6 +15,14 @@ cat > "$out/config.json" <<'JSON'
 {
   "version": 3,
   "routes": [
+    {
+      "src": "/(.*)",
+      "headers": {
+        "Cross-Origin-Opener-Policy": "same-origin",
+        "Cross-Origin-Embedder-Policy": "credentialless"
+      },
+      "continue": true
+    },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

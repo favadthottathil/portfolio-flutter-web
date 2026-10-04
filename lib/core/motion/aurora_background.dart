@@ -1,5 +1,4 @@
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,11 @@ import 'package:flutter/scheduler.dart';
 import '../theme/app_theme.dart';
 
 /// Slow-drifting mesh-gradient blobs behind the page content.
+///
+/// The blobs are radial gradients with a long, eased falloff rather than hard
+/// discs run through a blur filter. Blurring the whole viewport (sigma 90) on
+/// every frame was the single most expensive thing on the page; the gradient
+/// stops below produce the same soft glow for the cost of four fills.
 class AuroraBackground extends StatefulWidget {
   const AuroraBackground({
     super.key,
@@ -48,16 +52,13 @@ class _AuroraBackgroundState extends State<AuroraBackground>
   @override
   Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 90, sigmaY: 90),
-        child: CustomPaint(
-          painter: _AuroraPainter(
-            seconds: _seconds,
-            pointer: widget.pointer,
-            scrollOffset: widget.scrollOffset,
-          ),
-          size: Size.infinite,
+      child: CustomPaint(
+        painter: _AuroraPainter(
+          seconds: _seconds,
+          pointer: widget.pointer,
+          scrollOffset: widget.scrollOffset,
         ),
+        size: Size.infinite,
       ),
     );
   }
@@ -97,8 +98,12 @@ class _AuroraPainter extends CustomPainter {
             pointer.dy * depth -
             scrollOffset * 0.06,
       );
+      // Larger than the old pre-blur disc: a sigma-90 blur spread the glow
+      // roughly two sigmas past its edge, so the gradient has to reach as far.
       final radius =
-          blob.radius * size.shortestSide * (1 + 0.06 * math.sin(t * 1.3));
+          (blob.radius * size.shortestSide + 160) *
+          (1 + 0.06 * math.sin(t * 1.3));
+      final alpha = 0.30 * blob.intensity;
 
       canvas.drawCircle(
         center,
@@ -106,9 +111,13 @@ class _AuroraPainter extends CustomPainter {
         Paint()
           ..shader = RadialGradient(
             colors: [
-              blob.color.withValues(alpha: 0.30 * blob.intensity),
+              blob.color.withValues(alpha: alpha),
+              blob.color.withValues(alpha: alpha * 0.72),
+              blob.color.withValues(alpha: alpha * 0.32),
+              blob.color.withValues(alpha: alpha * 0.08),
               blob.color.withValues(alpha: 0.0),
             ],
+            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
           ).createShader(Rect.fromCircle(center: center, radius: radius)),
       );
     }
