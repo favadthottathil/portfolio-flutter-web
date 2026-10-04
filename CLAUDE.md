@@ -65,7 +65,7 @@ Key structural points:
   - `GlassCard` renders the frosted surfaces and takes an optional `accent` that tints its stroke and outer glow.
 - **The motion layer lives in [lib/core/motion/](lib/core/motion/)** and is what gives the page its "AI era" feel. Four pieces, all driven from `PortfolioShell`:
   - `PointerTracker` — an `InheritedWidget` publishing the cursor position normalized to `-1..1`; background layers read it via `PointerTracker.of(context)` instead of each installing its own `MouseRegion`.
-  - `AuroraBackground` — `Ticker`-driven `CustomPaint` of drifting radial-gradient blobs, heavily blurred via `ImageFiltered`, parallaxed by pointer and scroll offset.
+  - `AuroraBackground` — `Ticker`-driven `CustomPaint` of drifting radial-gradient blobs with a soft multi-stop falloff (no blur filter — see Scroll performance), parallaxed by pointer and scroll offset.
   - `NeuralField` — `CustomPaint` constellation of drifting nodes joined by proximity links (the neural-net motif). Node count and link distance are reduced on mobile for performance.
   - `Tilt3D` — perspective transform (`Matrix4..setEntry(3, 2, 0.0012)` plus `rotateX`/`rotateY`) that tilts a card toward the cursor with a cursor-tracking specular sheen. Wraps the experience, project, and skill cards.
   - `ScrollReveal` / `ScrollRevealScope` — sections fade and lift in as they enter the viewport. Note the reveals live *inside* the scroll view, so a `NotificationListener` above them would never see their notifications; instead `PortfolioShell` passes its `ScrollController` down through `ScrollRevealScope` (an `InheritedNotifier`) and each `ScrollReveal` listens to it and measures its own `RenderBox`.
