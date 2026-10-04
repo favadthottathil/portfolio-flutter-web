@@ -6,6 +6,13 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      # google_fonts 9 moved to the standalone material_ui package, whose
+      # TextTheme is a different type from package:flutter/material.dart's,
+      # so it doesn't compile against this app. Lift this once the app itself
+      # migrates to material_ui.
+      - dependency-name: google_fonts
+        update-types: ["version-update:semver-major"]
     groups:
       pub-minor-and-patch:
         update-types: [minor, patch]
