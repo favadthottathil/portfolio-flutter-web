@@ -27,7 +27,7 @@ Tests in [test/](test/) are data-integrity and contract tests: unique titles, `h
 
 ### Deployment
 
-Deployed on Vercel (see [vercel.json](vercel.json)). The build command is [build.sh](build.sh), which clones the Flutter SDK at the version pinned in `.fvmrc` into the workspace at build time (Vercel's build image has no Flutter preinstalled), runs `flutter pub get --enforce-lockfile` and `flutter build web --release`, and fails if the resume PDF is missing from the output. Once GitHub-driven deploys are enabled (see docs/CI_CD.md), Vercel no longer builds; CI uploads a prebuilt `build/web`, and [tool/vercel_prebuilt.sh](tool/vercel_prebuilt.sh) recreates the SPA rewrite for it. Output directory is `build/web`, with a catch-all rewrite to `index.html` for client-side routing.
+Deployed on Vercel (see [vercel.json](vercel.json)). The build command is [build.sh](build.sh), which clones the Flutter SDK at the version pinned in `.fvmrc` into the workspace at build time (Vercel's build image has no Flutter preinstalled), runs `flutter pub get --enforce-lockfile` and `flutter build web --release --wasm`, and fails if the resume PDF is missing from the output. Once GitHub-driven deploys are enabled (see docs/CI_CD.md), Vercel no longer builds; CI uploads a prebuilt `build/web`, and [tool/vercel_prebuilt.sh](tool/vercel_prebuilt.sh) recreates the SPA rewrite for it. Output directory is `build/web`, with a catch-all rewrite to `index.html` for client-side routing.
 
 ## Architecture
 
