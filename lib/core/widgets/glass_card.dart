@@ -9,6 +9,10 @@ import '../theme/app_theme.dart';
 /// frame — on web that is the difference between smooth and janky scrolling.
 /// The same look is achieved with a translucent tinted fill over the dark
 /// background, which costs nothing to composite.
+///
+/// For the same reason there is no drop shadow at rest: a blurred black
+/// shadow is invisible against the near-black page but was still rasterised
+/// for every card on every frame. Only the hovered card gets a (tinted) glow.
 class GlassCard extends StatelessWidget {
   const GlassCard({
     super.key,
@@ -48,16 +52,16 @@ class GlassCard extends StatelessWidget {
                 accent?.withValues(alpha: 0.35) ?? AppColors.glassStroke(0.09),
             width: 1.2,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: (accent ?? Colors.black).withValues(
-                alpha: accent != null ? 0.18 : 0.45,
-              ),
-              blurRadius: accent != null ? 40 : 30,
-              spreadRadius: accent != null ? -8 : -12,
-              offset: const Offset(0, 18),
-            ),
-          ],
+          boxShadow: accent == null
+              ? null
+              : [
+                  BoxShadow(
+                    color: accent!.withValues(alpha: 0.18),
+                    blurRadius: 40,
+                    spreadRadius: -8,
+                    offset: const Offset(0, 18),
+                  ),
+                ],
         ),
         child: child,
       ),

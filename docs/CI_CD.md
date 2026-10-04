@@ -16,10 +16,10 @@ build ───┘          └─> deploy-production  (push to main)
 | Job | What it enforces |
 |---|---|
 | **quality** | `pub get --enforce-lockfile` (the committed lockfile is authoritative), `dart format --set-exit-if-changed`, `flutter analyze --fatal-infos --fatal-warnings`, and `flutter test --coverage` (coverage uploaded as an artifact). |
-| **build** | `flutter build web --release`, then checks that `index.html`, `main.dart.js`, `flutter_bootstrap.js` and the resume PDF are present. Fails if `main.dart.js` goes over the 2.5 MiB budget (`MAIN_JS_BUDGET_BYTES`) and writes a size table to the run summary. Uploads `build/web` as the `web-build` artifact. |
-| **smoke** | Serves the artifact and loads it in headless Chromium at desktop and phone sizes via [`tool/smoke`](../tool/smoke). It fails if `<flutter-view>` never mounts, if any console or page error is logged, or if the resume URL doesn't return a PDF. Screenshots are uploaded as the `smoke-screenshots` artifact. |
+| **build** | `flutter build web --release --wasm` (the Wasm build plus its JS fallback), then checks that `index.html`, `main.dart.js`, `main.dart.wasm`, `flutter_bootstrap.js` and the resume PDF are present. Fails if `main.dart.js` goes over the 2.5 MiB budget (`MAIN_JS_BUDGET_BYTES`) and writes a size table to the run summary. Uploads `build/web` as the `web-build` artifact. |
+| **smoke** | Serves the artifact with the production COOP/COEP headers ([`tool/smoke/serve.py`](../tool/smoke/serve.py)) and loads it in headless Chromium at desktop and phone sizes via [`tool/smoke`](../tool/smoke). It fails if `<flutter-view>` never mounts, if the page isn't running the multi-threaded Wasm renderer (cross-origin isolated skwasm), if any console or page error is logged, or if the resume URL doesn't return a PDF. Screenshots are uploaded as the `smoke-screenshots` artifact. |
 | **deploy-preview** | Deploys the **same artifact** that was tested (`vercel deploy --prebuilt`). The preview URL appears on the PR as a GitHub deployment. |
-| **deploy-production** | Same, with `--prod`, behind the `production` environment. Afterwards it checks `/`, the resume PDF and a deep link (SPA fallback) on the live site. |
+| **deploy-production** | Same, with `--prod`, behind the `production` environment. Afterwards it checks `/`, the resume PDF, a deep link (SPA fallback) and the COOP/COEP headers on the live site. |
 
 Other automation:
 
@@ -60,9 +60,9 @@ dart format --output=none --set-exit-if-changed lib test
 flutter analyze --fatal-infos --fatal-warnings
 flutter test
 
-flutter build web --release
-python3 -m http.server 8080 --directory build/web &
-(cd tool/smoke && npm ci && npx playwright install chromium && npm run smoke)
+flutter build web --release --wasm
+python3 tool/smoke/serve.py 8080 build/web &
+(cd tool/smoke && npm ci && npx playwright install chromium && REQUIRE_SKWASM=1 npm run smoke)
 ```
 
 ## Upgrading Flutter

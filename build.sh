@@ -32,7 +32,9 @@ flutter config --no-analytics >/dev/null
 flutter --version
 
 flutter pub get --enforce-lockfile
-flutter build web --release
+# --wasm also emits the JS build; the bootstrap picks Wasm (skwasm renderer)
+# where the browser supports WasmGC and falls back to JS + CanvasKit elsewhere.
+flutter build web --release --wasm
 
 # Fail the deploy rather than ship a site whose resume button 404s.
 test -f build/web/assets/assets/Favad_Thottathil_Resume.pdf ||

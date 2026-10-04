@@ -82,11 +82,11 @@ jobs:
       - run: flutter pub get --enforce-lockfile
 
       - name: Build
-        run: flutter build web --release
+        run: flutter build web --release --wasm
 
       - name: Verify build output
         run: |
-          for f in build/web/index.html build/web/main.dart.js build/web/flutter_bootstrap.js "$RESUME_PATH"; do
+          for f in build/web/index.html build/web/main.dart.js build/web/main.dart.wasm build/web/flutter_bootstrap.js "$RESUME_PATH"; do
             test -s "$f" || { echo "::error file=$f::missing or empty in build output"; exit 1; }
           done
 
@@ -145,8 +145,11 @@ jobs:
         env:
           BASE_URL: http://127.0.0.1:8080
           SCREENSHOT_DIR: ${{ github.workspace }}/smoke-screenshots
+          # Served with the same COOP/COEP headers as production, so this
+          # proves the multi-threaded Wasm renderer actually boots.
+          REQUIRE_SKWASM: "1"
         run: |
-          python3 -m http.server 8080 --bind 127.0.0.1 --directory "$GITHUB_WORKSPACE/build/web" &
+          python3 serve.py 8080 "$GITHUB_WORKSPACE/build/web" &
           for _ in $(seq 1 20); do curl -fs "$BASE_URL/" >/dev/null && break; sleep 0.5; done
           npm run smoke
 
@@ -256,3 +259,8 @@ jobs:
           check "$SITE_URL/"
           check "$SITE_URL/assets/assets/Favad_Thottathil_Resume.pdf"
           check "$SITE_URL/some/deep/link" # SPA fallback to index.html
+          # Without these, the Wasm renderer silently drops to single-threaded.
+          headers=$(curl -sI "$SITE_URL/")
+          for h in 'cross-origin-opener-policy: same-origin' 'cross-origin-embedder-policy: credentialless'; do
+            grep -qi "^$h" <<<"$headers" || { echo "::error::missing header: $h"; exit 1; }
+          done

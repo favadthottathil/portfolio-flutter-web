@@ -53,7 +53,7 @@ class _ProjectCardState extends State<ProjectCard> {
                         spacing: 8,
                         runSpacing: 8,
                         children: [
-                          if (widget.project.tag != null)
+                          if (isWide && widget.project.tag != null)
                             _StatusTag(
                               label: widget.project.tag!,
                               accent: accent,
@@ -66,7 +66,14 @@ class _ProjectCardState extends State<ProjectCard> {
                   ),
                 ],
               ),
-              const SizedBox(height: 28),
+              // On phones the tag shares the header row with up to four link
+              // buttons and ran off the card; give it its own line instead.
+              if (!isWide && widget.project.tag != null) ...[
+                const SizedBox(height: 18),
+                _StatusTag(label: widget.project.tag!, accent: accent),
+                const SizedBox(height: 20),
+              ] else
+                const SizedBox(height: 28),
               Text(
                 widget.project.title,
                 style: GoogleFonts.outfit(
@@ -180,13 +187,15 @@ class _StatusTag extends StatelessWidget {
             decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
           ),
           const SizedBox(width: 7),
-          Text(
-            label,
-            style: TextStyle(
-              color: accent,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: accent,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.3,
+              ),
             ),
           ),
         ],
