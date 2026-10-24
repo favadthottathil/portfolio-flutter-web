@@ -2,6 +2,30 @@ import 'models/project.dart';
 
 const List<Project> projects = [
   Project(
+    title: 'Navarasami Home Services',
+    subtitle: 'Two mobile apps · Freelance project · Aug 2026 – Present',
+    tag: 'In progress',
+    description:
+        'A home-services platform delivered as two Flutter apps: a Customer app for booking '
+        'services and a Service Adviser app for field staff. Designed for easy maintenance, with '
+        'secure sign-in and protected user data.',
+    highlights: [
+      'Customer app: service booking, quotations, Razorpay payments, complaint tracking, and notifications.',
+      'Service Adviser app: attendance check-in, site visits, material requests, and location tracking for field staff.',
+      'Clean Architecture and BLoC across both apps.',
+      '160+ automated test files and an automatic release process (GitHub Actions, Fastlane) with signed builds and Firebase Crashlytics crash reporting.',
+    ],
+    techStack: [
+      'Flutter',
+      'BLoC',
+      'Clean Architecture',
+      'Razorpay',
+      'GitHub Actions',
+      'Fastlane',
+      'Crashlytics',
+    ],
+  ),
+  Project(
     title: 'CollegeLinkr',
     subtitle: 'Agent app · Technical lead · iOS & Android · Jun – Aug 2026',
     tag: 'Live on Play Store · 50+ downloads',
@@ -101,6 +125,7 @@ const List<Project> projects = [
       'Flutter Web dashboard (fl_chart, go_router) showing real-time metrics with AI-generated, severity-scored insights.',
       'Node.js/Express + PostgreSQL backend with a JWT-authenticated ingestion API, per-key rate limiting, and SSE streaming.',
       'Gemini integration generating issue and recommendation reports automatically; Razorpay for subscription billing.',
+      'Server and database packaged with Docker so the whole system starts with one command; automated builds publish the image and it runs live on Render.',
     ],
     techStack: [
       'Flutter',
@@ -109,6 +134,7 @@ const List<Project> projects = [
       'PostgreSQL',
       'Gemini API',
       'fl_chart',
+      'Docker',
     ],
     links: [
       ProjectLink(
@@ -144,13 +170,21 @@ const List<Project> projects = [
     title: 'Zenith AI',
     subtitle: 'Cross-platform AI app · Personal project',
     description:
-        'An AI-powered app that gives instant, live responses using Google Gemini. I built and '
-        'deployed both the Flutter app and its Python backend.',
+        'An AI-powered mobile app that streams instant, live answers from Google Gemini. I built '
+        'both the Flutter app and its FastAPI server.',
     highlights: [
-      'Instant, live AI responses powered by the Google Gemini API.',
-      'Full-stack ownership — Flutter frontend plus a Python server, both built and deployed solo.',
+      'Live, streamed AI responses over WebSocket, powered by the Google Gemini API.',
+      'Full-stack ownership — Flutter frontend plus a Python (FastAPI) server, both built and deployed solo.',
+      'Server packaged with Docker so it runs the same everywhere, with secrets kept out of the code; automated builds publish the image to GitHub Container Registry.',
     ],
-    techStack: ['Flutter', 'Dart', 'Python', 'Gemini API'],
+    techStack: [
+      'Flutter',
+      'Dart',
+      'FastAPI',
+      'WebSocket',
+      'Gemini API',
+      'Docker',
+    ],
     links: [
       ProjectLink(
         type: ProjectLinkType.live,
@@ -167,6 +201,44 @@ const List<Project> projects = [
         type: ProjectLinkType.source,
         url: 'https://github.com/favadthottathil/ZenithAI-Backend-python',
         tooltip: 'Backend source',
+      ),
+    ],
+  ),
+  Project(
+    title: 'Flutter Gemini Chat',
+    subtitle: 'AI chat app · Personal project',
+    description:
+        'An AI chat app with LLM integration that streams Google Gemini replies live as they are '
+        'written, backed by 98 automated tests.',
+    highlights: [
+      'Gemini replies stream into the chat live as they are written.',
+      'Backed by 98 automated tests.',
+    ],
+    techStack: ['Flutter', 'Dart', 'Gemini API'],
+    links: [
+      ProjectLink(
+        type: ProjectLinkType.source,
+        url: 'https://github.com/favadthottathil/flutter-gemini-chat',
+        tooltip: 'View on GitHub',
+      ),
+    ],
+  ),
+  Project(
+    title: 'flutter_device_insights',
+    subtitle: 'Open-source Flutter plugin · Android & iOS',
+    description:
+        'A free, open-source Flutter plugin that lets apps read device details such as battery '
+        'level and phone model on Android and iOS, using native code through Platform Channels.',
+    highlights: [
+      'Native integration in Kotlin (Android) and Swift (iOS).',
+      'Native code reaches Dart through Platform Channels.',
+    ],
+    techStack: ['Flutter', 'Dart', 'Kotlin', 'Swift', 'Platform Channels'],
+    links: [
+      ProjectLink(
+        type: ProjectLinkType.source,
+        url: 'https://github.com/favadthottathil/flutter_device_insights',
+        tooltip: 'View on GitHub',
       ),
     ],
   ),
