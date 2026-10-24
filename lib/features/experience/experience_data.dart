@@ -2,6 +2,16 @@ import 'models/experience_entry.dart';
 
 const List<ExperienceEntry> experienceEntries = [
   ExperienceEntry(
+    title: 'Freelance Flutter Developer',
+    company: '@ Navarasami Home Services',
+    date: 'Aug 2026 - Present',
+    bullets: [
+      'Building two mobile apps for a home-services platform: a Customer app (service booking, quotations, Razorpay payments, complaint tracking, notifications) and a Service Adviser app for field staff (attendance check-in, site visits, material requests, location tracking).',
+      'Designed both apps for easy maintenance with Clean Architecture and BLoC, with secure sign-in and protected user data.',
+      'Set up 160+ automated test files and an automatic release process with GitHub Actions and Fastlane, shipping signed builds with Firebase Crashlytics crash reporting.',
+    ],
+  ),
+  ExperienceEntry(
     title: 'Flutter Developer',
     company: '@ Promilo (Sawara Solution Pvt Ltd)',
     date: 'Mar 2024 - Aug 2026',

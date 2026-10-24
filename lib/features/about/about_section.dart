@@ -21,8 +21,9 @@ class AboutSection extends StatelessWidget {
         'are invisible when they work — session handling that does not drop users, architecture '
         'that survives the next feature, tests that catch the regression before QA does.',
     'I am based in Bengaluru, originally from the Malabar region of Kerala, and I work in '
-        'Malayalam and English. On the side I build open-source Flutter tooling and AI-powered '
-        'apps with Google Gemini. I am available to join immediately, with no notice period.',
+        'Malayalam and English. Right now I am building a two-app home-services platform as a '
+        'freelancer, and on the side I build open-source Flutter tooling and AI-powered apps with '
+        'Google Gemini. I am available to join immediately, with no notice period.',
   ];
 
   @override
